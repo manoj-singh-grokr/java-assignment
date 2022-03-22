@@ -15,10 +15,12 @@ import java.util.List;
 public class EmployeeDAOHibernateImpl implements EmployeeDAO {
 
     private final EntityManager entityManager;
+    private Session currentSession;
 
     @Autowired
-    public EmployeeDAOHibernateImpl(EntityManager entityManager){
+    public EmployeeDAOHibernateImpl(EntityManager entityManager, Session session){
         this.entityManager = entityManager;
+        this.currentSession = session;
     }
 
 
@@ -33,22 +35,16 @@ public class EmployeeDAOHibernateImpl implements EmployeeDAO {
 
     @Override
     public Employee findById(Integer id) {
-        // get the current hibernate session
-        Session currentSession = entityManager.unwrap(Session.class);
-        //get the employee
-        //return the employee
         return currentSession.get(Employee.class, id);
     }
 
     @Override
     public void save(Employee newEmployee) {
-        Session currentSession = entityManager.unwrap(Session.class);
         currentSession.saveOrUpdate(newEmployee);
     }
 
     @Override
     public void deleteById(Integer id) {
-        Session currentSession = entityManager.unwrap(Session.class);
         Query theQuery = currentSession.createQuery("delete from Employee where emp_id=:employeeId");
         theQuery.setParameter("employeeId", id);
         theQuery.executeUpdate();

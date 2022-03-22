@@ -68,14 +68,22 @@ public class MainController {
         return "redirect:/database/"+tenant_id+"/books";
     }
 
+    @GetMapping("/users")
+    public @ResponseBody List<? extends Object> getUsers(@PathVariable("tenant_id") Integer tenant_id){
+        if(tenant_id == 1){
+            return userService.getAllUsers();
+        }
+        return userService2.getAllUsers();
+    }
+
     @GetMapping("/books")
     public String getBooks(@PathVariable("tenant_id") Integer tenant_id , Model model){
        if(tenant_id == 1){
            model.addAttribute("books", service.getAllBooks());
-           return "index";
+           return "homePage";
        }
        model.addAttribute("books", service2.getAllBooks());
-       return "index";
+       return "homePage";
     }
 
     @GetMapping("/book/{id}")
@@ -84,14 +92,6 @@ public class MainController {
             return service.getBookById(id);
         }
         return service2.getBookById(id);
-    }
-
-    @GetMapping("/users")
-    public List<? extends Object> getUsers(@PathVariable("tenant_id") Integer id){
-        if(id==1){
-            return userService.getAllUsers();
-        }
-        return userService2.getAllUsers();
     }
 
     @GetMapping("/delete/{id}")
