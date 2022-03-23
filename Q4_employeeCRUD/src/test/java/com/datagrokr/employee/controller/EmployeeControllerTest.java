@@ -1,13 +1,11 @@
 package com.datagrokr.employee.controller;
 
-import com.datagrokr.employee.dao.EmployeeDAOHibernateImpl;
 import com.datagrokr.employee.entity.Employee;
 import com.datagrokr.employee.service.EmployeeServiceImpl;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -15,14 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -45,6 +38,8 @@ class EmployeeControllerTest {
 
     private EmployeeController underTest;
 
+    @BeforeAll
+
 
     @BeforeEach
     void setUp(){
@@ -62,9 +57,7 @@ class EmployeeControllerTest {
     @Test
     void isEmployeeSaved() throws Exception {
         Employee newEmployee = new Employee("Testing", "Testing", "testingnew@testing.com", 56200.0);
-
         String url = "/addEmployee";
-
         mockMvc.perform(
                 post(url).flashAttr("employee", newEmployee)
         )
@@ -88,29 +81,32 @@ class EmployeeControllerTest {
 
     @Test
     void deleteEmployee() throws Exception {
-        int id = 1;
+        int id=1;
+        Employee newEmployee = new Employee(id,"Man", "Tester", "man@test.com", 50000.0);
+        Mockito.when(service.findById(id)).thenReturn(newEmployee);
         String url = "/delete/"+id;
-        mockMvc.perform(get(url)).andExpect(status().isOk());
+        mockMvc.perform(get(url)).andExpect(status().is3xxRedirection());
         verify(service).deleteById(id);
     }
 
-//    @Test
-//    void employeeUpdateForm() throws Exception {
-//        int id=1;
-//        Employee newEmployee = new Employee(id,"Man", "Tester", "man@test.com", 50000.0);
-//        String url = "/employeeUpdateForm/"+id;
-//        mockMvc.perform(
-//                get(url)
-//                .flashAttr("employee", newEmployee)
-//        );
-//    }
-
     @Test
-    void isEmployeeUpdated() throws Exception {
-
+    void employeeUpdateForm() throws Exception {
+        int id=1;
+        Employee newEmployee = new Employee(id,"Man", "Tester", "man@test.com", 50000.0);
+        String url = "/employeeUpdateForm/"+id;
+        Mockito.when(service.findById(id)).thenReturn(newEmployee);
+        mockMvc.perform(
+                get(url)
+        ).andExpect(status().isOk());
+        verify(service).findById(id);
     }
 
     @Test
-    void mostBought() {
+    void isEmployeeUpdated() throws Exception {
+        int id=1;
+        Employee newEmployee = new Employee(id,"Man", "Tester", "man@test.com", 50000.0);
+        String url = "/update";
+        mockMvc.perform(post(url).flashAttr("employee", newEmployee));
+        verify(service).save(newEmployee);
     }
 }
