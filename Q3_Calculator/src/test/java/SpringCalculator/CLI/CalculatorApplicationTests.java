@@ -52,7 +52,7 @@ class CalculatorApplicationTests {
 	@Test
 	public void ShouldDivideTwoNumbers() throws Exception{
 		double num1 = 5;
-		double num2 = 6;
+		double num2 = 10;
 		double result = controller.divide(num1,num2);
 		assertThat(result).isEqualTo(0.5);
 	}
