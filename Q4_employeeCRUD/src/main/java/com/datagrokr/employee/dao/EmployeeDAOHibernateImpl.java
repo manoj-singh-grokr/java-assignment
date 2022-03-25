@@ -2,8 +2,6 @@ package com.datagrokr.employee.dao;
 
 import com.datagrokr.employee.entity.Employee;
 import com.datagrokr.employee.entity.Sales;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -15,12 +13,10 @@ import java.util.List;
 public class EmployeeDAOHibernateImpl implements EmployeeDAO {
 
     private final EntityManager entityManager;
-    private Session currentSession;
 
     @Autowired
-    public EmployeeDAOHibernateImpl(EntityManager entityManager, Session session){
+    public EmployeeDAOHibernateImpl(EntityManager entityManager){
         this.entityManager = entityManager;
-        this.currentSession = session;
     }
 
 
@@ -35,19 +31,26 @@ public class EmployeeDAOHibernateImpl implements EmployeeDAO {
 
     @Override
     public Employee findById(Integer id) {
-        return currentSession.get(Employee.class, id);
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Employee> query = cb.createQuery(Employee.class);
+        Root<Employee> employee = query.from(Employee.class);
+        query.select(employee).where(cb.equal(employee.get("emp_id"), id));
+        return entityManager.createQuery(query).getSingleResult();
     }
 
     @Override
     public void save(Employee newEmployee) {
-        currentSession.saveOrUpdate(newEmployee);
+        entityManager.persist(newEmployee);
     }
 
     @Override
     public void deleteById(Integer id) {
-        Query theQuery = currentSession.createQuery("delete from Employee where emp_id=:employeeId");
-        theQuery.setParameter("employeeId", id);
-        theQuery.executeUpdate();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaDelete<Employee> delete = cb.
+                createCriteriaDelete(Employee.class);
+        Root<Employee> e = delete.from(Employee.class);
+        delete.where(cb.equal(e.get("emp_id"), id));
+        entityManager.createQuery(delete).executeUpdate();
     }
 
     @Override
@@ -56,8 +59,7 @@ public class EmployeeDAOHibernateImpl implements EmployeeDAO {
         CriteriaQuery<Employee> query = cb.createQuery(Employee.class);
         Root<Employee> employee = query.from(Employee.class);
         query.select(employee).where(cb.equal(employee.get("email"), email));
-        Employee result = entityManager.createQuery(query).getSingleResult();
-        return result;
+        return entityManager.createQuery(query).getSingleResult();
     }
 
     @Override
@@ -66,9 +68,8 @@ public class EmployeeDAOHibernateImpl implements EmployeeDAO {
             CriteriaQuery<Sales> query = cb.createQuery(Sales.class);
             Root<Sales> root = query.from(Sales.class);
             Join<Object, Object> sales = root.join("book");
-            query.select(sales.get("book_name")).where(cb.like(sales.get("genre"), "Software Architecture")).groupBy(sales.get("book_id"));
-            List<Sales> result = entityManager.createQuery(query).getResultList();
-            return result;
+            query.select(sales.get("book_name")).where(cb.like(sales.get("genre"), "Software Architecture")).groupBy(sales.get("book_id")).orderBy(cb.desc(cb.count(query.from(Sales.class))));
+            return entityManager.createQuery(query).getResultList();
     }
 
 }
