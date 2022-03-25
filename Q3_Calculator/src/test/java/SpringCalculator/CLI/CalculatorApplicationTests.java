@@ -29,7 +29,7 @@ class CalculatorApplicationTests {
 	public void ShouldAddTwoNumbers() throws Exception{
 		double num1 = 5;
 		double num2 = 6;
-		double result = controller.add(5.0,6.0);
+		double result = controller.add(num1,num2);
 		assertThat(result).isEqualTo(11.0);
 	}
 
@@ -37,7 +37,7 @@ class CalculatorApplicationTests {
 	public void ShouldSubtractTwoNumbers() throws Exception{
 		double num1 = 5;
 		double num2 = 6;
-		double result = controller.subtract(5.0,6.0);
+		double result = controller.subtract(num1,num2);
 		assertThat(result).isEqualTo(-1.0);
 	}
 
@@ -45,7 +45,7 @@ class CalculatorApplicationTests {
 	public void ShouldMultiplyTwoNumbers() throws Exception{
 		double num1 = 5;
 		double num2 = 6;
-		double result = controller.multiply(5.0,6.0);
+		double result = controller.multiply(num1,num2);
 		assertThat(result).isEqualTo(30.0);
 	}
 
@@ -53,7 +53,7 @@ class CalculatorApplicationTests {
 	public void ShouldDivideTwoNumbers() throws Exception{
 		double num1 = 5;
 		double num2 = 6;
-		double result = controller.divide(5.0,10.0);
+		double result = controller.divide(num1,num2);
 		assertThat(result).isEqualTo(0.5);
 	}
 
